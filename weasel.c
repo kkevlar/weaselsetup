@@ -2,10 +2,12 @@
 #include <stdio.h>
 #include <SDL2/SDL.h>
 #include <string.h>
-#include <stdbool.h>
+
+#define MAX_CONTROLLERS 24
+#define true 1
 
 
-SDL_Joystick* get_xbox_joystick()
+void get_joysticks(SDL_Joystick** joys)
 {
     
     const int n = SDL_NumJoysticks();
@@ -14,19 +16,35 @@ SDL_Joystick* get_xbox_joystick()
     {
         printf("%s\n",SDL_JoystickNameForIndex(i));
         // if (strncmp(SDL_JoystickNameForIndex(i), name, sizeof name) == 0)
-        //     return SDL_JoystickOpen(i);
+        *(joys+i) = SDL_JoystickOpen(i);
     }
-    return NULL;
 }
 
 
 int main(void)
 {   
+    SDL_Joystick* controllers[MAX_CONTROLLERS]; 
+    char nullstring[] = "null";
+
     printf("about to init\n");
     SDL_Init(SDL_INIT_JOYSTICK);
     printf("has init\n");
-    SDL_Joystick *ctrl = get_xbox_joystick();
+    get_joysticks(controllers);
     
+    printf("lmao %s\n", SDL_JoystickNameForIndex(0));
+
+    while(true)
+    {
+        SDL_JoystickUpdate();
+        for(int i = 0; i < MAX_CONTROLLERS; i++)
+        {
+            if (controllers[i] && SDL_JoystickNameForIndex(i) && strncmp(SDL_JoystickNameForIndex(i),nullstring, sizeof nullstring) != 0)
+            {
+                printf(">>>%s\n",SDL_JoystickNameForIndex(i));
+            }
+        }
+        break;
+    }
 
     // double radio_input[16] = {0};
 
