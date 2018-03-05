@@ -39,16 +39,17 @@ int main(void)
 	if(result != 1)
 		boo("Malformed deviceno line.");
 
-	fresh(file);
+	printf("Device Number=%d\n",deviceno);
 
-	printf("Deviceno=%d\n",deviceno);
+	//will need to loop this because EOF and newline sadddd
+	fgets(my_buf, 8000, file);
 
+	printf("lel %s",my_buf);
 
+	// scanf(file,"%s = `%s`",my_buf, my_buf+4000);
 
-	result = fscanf(file,"%s = `%s`",my_buf, my_buf+4000);
-
-	if(result!= 2)
-		boo("Malformed binding line.");
+	// if(result!= 2)
+	// 	boo("Malformed binding line.");
 
 
 	fclose(file);   
