@@ -12,7 +12,7 @@ void get_joysticks(SDL_Joystick** joys)
 {
     
     const int n = SDL_NumJoysticks();
-    char name[] = "Teensyduino Serial/Keyboard/Mouse/Joystick";
+    // char name[] = "Teensyduino Serial/Keyboard/Mouse/Joystick";
     for (int i = 0; i < n; ++i) 
     {
         //printf("%s\n",SDL_JoystickNameForIndex(i));
@@ -25,7 +25,7 @@ void get_joysticks(SDL_Joystick** joys)
 int main(void)
 {   
     SDL_Joystick* controllers[MAX_CONTROLLERS]; 
-    char nullstring[] = "null";
+    // char nullstring[] = "null";
 
     printf("\nThis is the Weasel Setup Wizard\n");
     printf("Initializing SDL... ");
@@ -43,34 +43,43 @@ int main(void)
     SDL_JoystickUpdate();
     for(int i = 0; i < MAX_CONTROLLERS; i++)
     {
-        if (controllers[i] && SDL_JoystickNameForIndex(i) )//&& strncmp(SDL_JoystickNameForIndex(i),nullstring, sizeof nullstring) != 0)
+        if (controllers[i] && SDL_JoystickNameForIndex(i) )
         {
             printf("  - %d: %s\n",i,SDL_JoystickNameForIndex(i));
         }
     }
 
+    char filenamebuf[64];
+    sprintf(filenamebuf,"%smp-leftonly.ini",GCPAD_PATH);
+    FILE* leftonly = fopen(filenamebuf,"r");
+
+    fclose(leftonly);
+
+
+
+
     printf("\n");
 
-    while(true)
-    {
-        SDL_JoystickUpdate();
-        for(int i = 0; i < MAX_CONTROLLERS; i++)
-        {
-            if (controllers[i] && SDL_JoystickNameForIndex(i) )//&& strncmp(SDL_JoystickNameForIndex(i),nullstring, sizeof nullstring) != 0)
-            {
-                for (int axis = 0; axis < 24; axis++)
-                {
-                    int but =  SDL_JoystickGetButton(controllers[i], axis);
-                    if(but)
-                        printf("j=%d i=%d axis=%d button=%d\n",
-                        i,
-                        axis,
-                        SDL_JoystickGetAxis(controllers[i], axis),
-                        SDL_JoystickGetButton(controllers[i], axis));
-                }
-            }
-        }
-    }
+    // while(true)
+    // {
+    //     SDL_JoystickUpdate();
+    //     for(int i = 0; i < MAX_CONTROLLERS; i++)
+    //     {
+    //         if (controllers[i] && SDL_JoystickNameForIndex(i) )
+    //         {
+    //             for (int axis = 0; axis < 24; axis++)
+    //             {
+    //                 int but =  SDL_JoystickGetButton(controllers[i], axis);
+    //                 if(but)
+    //                     printf("j=%d i=%d axis=%d button=%d\n",
+    //                     i,
+    //                     axis,
+    //                     SDL_JoystickGetAxis(controllers[i], axis),
+    //                     SDL_JoystickGetButton(controllers[i], axis));
+    //             }
+    //         }
+    //     }
+    // }
 
     // double radio_input[16] = {0};
 
