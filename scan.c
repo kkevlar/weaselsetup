@@ -5,20 +5,18 @@
 
 int main(void)
 {	
-	char my_buf[4000];
-
-	printf(".\n");
+	char my_buf[8000];
 	FILE* file = fopen(GCPAD_PATH,"r");
-	printf(".\n");
 
-	fscanf(file,"%s",my_buf);
-	printf(".\n");
+	fgets(my_buf, 10, file);
 
-	printf("\n%s\n",my_buf);
-	printf(".\n");
+	int result = strcmp("[Profile]",my_buf);
+
+	sprintf(my_buf, "%s", result == 0 ? "Yay" : "Boo");
+
+	printf("%s\n",my_buf);
 
 	fclose(file);   
-	printf(".\n");
     return 0;
 }
 
