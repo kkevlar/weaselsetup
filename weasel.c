@@ -4,6 +4,7 @@
 #include <string.h>
 
 #define MAX_CONTROLLERS 24
+#define GCPAD_PATH "../../Dolphin\\ Emulator/Config/Profiles/GCPad/"
 #define true 1
 
 
@@ -90,9 +91,11 @@ int main(void)
     //     printf("\n");
     //     //cpSleep(1000);        
     // }
+
     printf("Quitting SDL... ");
     SDL_Quit();
     printf("Quit Successful\nGoodbye!\n\n");
+
     /*
     int motor_index = 0;
     int mode_index = 1;
