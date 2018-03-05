@@ -1,7 +1,26 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #define GCPAD_PATH "weaseltemplate.ini"
+
+void boo(char* errormsg)
+{
+	printf("ERROR: %s\n",errormsg);
+	printf("Parsing failed.\n");
+	exit(1);
+}
+
+void fresh(FILE* file)
+{
+	while(1)
+	{
+	char c[10];
+	fgets(c, 2, file);
+	if (c[0] == '\n')
+		break;
+}
+}
 
 int main(void)
 {	
@@ -9,12 +28,22 @@ int main(void)
 	FILE* file = fopen(GCPAD_PATH,"r");
 
 	fgets(my_buf, 10, file);
-
 	int result = strcmp("[Profile]",my_buf);
+	if(result)
+		boo("Malformed profile line.");
 
-	sprintf(my_buf, "%s", result == 0 ? "Yay" : "Boo");
+	fresh(file);
 
-	printf("%s\n",my_buf);
+	int deviceno;
+	result = fscanf(file,"Device = DInput/%d/Wireless Gamepad",&deviceno);
+	if(result != 1)
+		boo("Malformed deviceno line.");
+
+	fresh(file);
+
+	printf("Deviceno=%d\n",deviceno);
+
+	
 
 	fclose(file);   
     return 0;
