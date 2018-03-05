@@ -1,33 +1,24 @@
 #include <stdio.h>
-#include <dirent.h>
 #include <string.h>
 
-// #define GCPAD_PATH "../../Dolphin "
-#define GCPAD_PATH "../../Dolphin Emulator/Config/Profiles/GCPad"
-// #define GCPAD_PATH "."
+#define GCPAD_PATH "weaseltemplate.ini"
 
-// int main(void)
-// {
-//     struct dirent *de;  // Pointer for directory entry
- 
-//     // opendir() returns a pointer of DIR type. 
-//     DIR *dr = opendir(GCPAD_PATH);
- 
-//     if (dr == NULL)  // opendir returns NULL if couldn't open directory
-//     {
-//         printf("Could not open current directory" );
-//         return 0;
-//     }
- 
-//     // Refer http://pubs.opengroup.org/onlinepubs/7990989775/xsh/readdir.html
-//     // for readdir()
+int main(void)
+{	
+	char my_buf[4000];
 
+	printf(".\n");
+	FILE* file = fopen(GCPAD_PATH,"r");
+	printf(".\n");
 
-//     while ((de = readdir(dr)) != NULL)
-//        	if (strcmp(de->d_name, "..") != 0  &&
-//             strcmp(de->d_name, ".") != 0)
-//             	printf("%s\n", de->d_name);
- 
-//     closedir(dr);    
-//     return 0;
-// }
+	fscanf(file,"%s",my_buf);
+	printf(".\n");
+
+	printf("\n%s\n",my_buf);
+	printf(".\n");
+
+	fclose(file);   
+	printf(".\n");
+    return 0;
+}
+
