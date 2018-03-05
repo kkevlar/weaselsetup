@@ -43,7 +43,13 @@ int main(void)
 
 	printf("Deviceno=%d\n",deviceno);
 
-	
+
+
+	result = fscanf(file,"%s = `%s`",my_buf, my_buf+4000);
+
+	if(result!= 2)
+		boo("Malformed binding line.");
+
 
 	fclose(file);   
     return 0;
