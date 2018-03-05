@@ -2,14 +2,14 @@
 #include <stdlib.h>
 #include <string.h>
 
-void boo(char* errormsg)
+void combiner_error(char* errormsg)
 {
 	printf("ERROR: %s\n",errormsg);
 	printf("Parsing failed.\n");
 	exit(1);
 }
 
-void fresh(FILE* file)
+void combiner_burn_whitespace(FILE* file)
 {
 	while(1)
 	{
@@ -20,12 +20,19 @@ void fresh(FILE* file)
 	}
 }
 
-int combine_weasels(char* primary_file_name,
+int combine_configurations(char* primary_file_name,
 	char* secondary_file_name,
 	int primary_device_number,
 	int secondary_device_number,
 	char* output_file_name)
 {
+	printf("\nAttempting to combine: '%s'(%d) + '%s'(%d) -> %s\n",
+		primary_file_name,
+		primary_device_number,
+		secondary_file_name,
+		secondary_device_number,
+		output_file_name);
+
 	char my_buf[8000];
 	FILE* file = fopen(primary_file_name,"r");
 	FILE* outfile = fopen(output_file_name,"w");
@@ -33,14 +40,14 @@ int combine_weasels(char* primary_file_name,
 	fgets(my_buf, 10, file);
 	int result = strcmp("[Profile]",my_buf);
 	if(result)
-		boo("Malformed profile line.");
+		combiner_error("Malformed profile line.");
 
-	fresh(file);
+	combiner_burn_whitespace(file);
 
 	int deviceno;
 	result = fscanf(file,"Device = DInput/%d/Wireless Gamepad",&deviceno);
 	if(result != 1)
-		boo("Malformed deviceno line.");
+		combiner_error("Malformed deviceno line.");
 
 	printf("Primary Device Number %d -> %d\n",deviceno,primary_device_number);
 
@@ -71,46 +78,10 @@ int combine_weasels(char* primary_file_name,
 
 int main()
 {
-	combine_weasels("weaseltemplate.ini",
+	combine_configurations("weaseltemplate.ini",
 		"null",
 		0,
 		1,
 		"wcopy.ini");
 }
-// int main(void)
-// {
-// 	char my_buf[8000];
-// 	FILE* file = fopen(GCPAD_PATH,"r");
-// 	FILE* outfile = fopen("wcopy.ini","w");
-
-// 	fgets(my_buf, 10, file);
-// 	int result = strcmp("[Profile]",my_buf);
-// 	if(result)
-// 		boo("Malformed profile line.");
-
-// 	fresh(file);
-
-// 	int deviceno;
-// 	result = fscanf(file,"Device = DInput/%d/Wireless Gamepad",&deviceno);
-// 	if(result != 1)
-// 		boo("Malformed deviceno line.");
-
-// 	printf("Device Number=%d\n",deviceno);
-
-// 	fprintf(outfile, "[Profile]\n");
-// 	fprintf(outfile, "Device = DInput/%d/Wireless Gamepad\n",deviceno);
-// 	fflush(outfile);
-	
-// 	while(1)
-// 	{		
-// 		if (fgets(my_buf, 8000, file))
-// 			fprintf(outfile, "%s",my_buf);
-// 		else
-// 			break;
-// 	}
-
-// 	fclose(file);   
-// 	fclose(outfile);
-// 	return 0;
-// }
 
