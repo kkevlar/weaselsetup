@@ -14,7 +14,7 @@ void get_joysticks(SDL_Joystick** joys)
     char name[] = "Teensyduino Serial/Keyboard/Mouse/Joystick";
     for (int i = 0; i < n; ++i) 
     {
-        printf("%s\n",SDL_JoystickNameForIndex(i));
+        //printf("%s\n",SDL_JoystickNameForIndex(i));
         // if (strncmp(SDL_JoystickNameForIndex(i), name, sizeof name) == 0)
         *(joys+i) = SDL_JoystickOpen(i);
     }
@@ -26,24 +26,49 @@ int main(void)
     SDL_Joystick* controllers[MAX_CONTROLLERS]; 
     char nullstring[] = "null";
 
-    printf("about to init\n");
+    printf("\nThis is the Weasel Setup Wizard\n");
+    printf("Initializing SDL... ");
     SDL_Init(SDL_INIT_JOYSTICK);
-    printf("has init\n");
+    printf("Initialized\n");
+    printf("Initializing joysticks... ");
     get_joysticks(controllers);
+    printf("Initialized\n");
+
     
-    printf("lmao %s\n", SDL_JoystickNameForIndex(0));
+    // printf("lmao %s\n", SDL_JoystickNameForIndex(0));
+
+    printf("\nHere is a list of the joysticks connected: \n");
+
+    SDL_JoystickUpdate();
+    for(int i = 0; i < MAX_CONTROLLERS; i++)
+    {
+        if (controllers[i] && SDL_JoystickNameForIndex(i) )//&& strncmp(SDL_JoystickNameForIndex(i),nullstring, sizeof nullstring) != 0)
+        {
+            printf("  - %d: %s\n",i,SDL_JoystickNameForIndex(i));
+        }
+    }
+
+    printf("\n");
 
     while(true)
     {
         SDL_JoystickUpdate();
         for(int i = 0; i < MAX_CONTROLLERS; i++)
         {
-            if (controllers[i] && SDL_JoystickNameForIndex(i) && strncmp(SDL_JoystickNameForIndex(i),nullstring, sizeof nullstring) != 0)
+            if (controllers[i] && SDL_JoystickNameForIndex(i) )//&& strncmp(SDL_JoystickNameForIndex(i),nullstring, sizeof nullstring) != 0)
             {
-                printf(">>>%s\n",SDL_JoystickNameForIndex(i));
+                for (int axis = 0; axis < 24; axis++)
+                {
+                    int but =  SDL_JoystickGetButton(controllers[i], axis);
+                    if(but)
+                        printf("j=%d i=%d axis=%d button=%d\n",
+                        i,
+                        axis,
+                        SDL_JoystickGetAxis(controllers[i], axis),
+                        SDL_JoystickGetButton(controllers[i], axis));
+                }
             }
         }
-        break;
     }
 
     // double radio_input[16] = {0};
@@ -65,8 +90,9 @@ int main(void)
     //     printf("\n");
     //     //cpSleep(1000);        
     // }
+    printf("Quitting SDL... ");
     SDL_Quit();
-    printf("k done\n");
+    printf("Quit Successful\nGoodbye!\n\n");
     /*
     int motor_index = 0;
     int mode_index = 1;
