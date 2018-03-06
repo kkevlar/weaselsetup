@@ -83,10 +83,10 @@ void combine_configurations(char* primary_file_name,
 
 void move_config_across_files ()
 {
-	
+
 }
 
-
+#ifdef comb_test
 int main()
 {
 	combine_configurations("weaseltemplate.ini",
@@ -95,4 +95,4 @@ int main()
 		1,
 		"wcopy.ini");
 }
-
+#endif

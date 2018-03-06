@@ -13,5 +13,7 @@ void combine_configurations(char* primary_file_name,
 	int secondary_device_number,
 	char* output_file_name);
 void move_config_across_files();
+#ifdef comb_test
 int main();
+#endif
 #endif
