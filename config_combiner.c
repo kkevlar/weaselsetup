@@ -101,6 +101,7 @@ void move_config_across_files(char* my_buf, FILE* infile, FILE* outfile, int int
         if (mode == COPY_MODE_SECONDARY)
         {
             //do the ` parsing here
+            #warning "Quote parsing incomplete"
         }
         else if (mode == COPY_MODE_PRIMARY)
         {
@@ -115,6 +116,7 @@ void move_config_across_files(char* my_buf, FILE* infile, FILE* outfile, int int
 }
 
 #ifdef comb_test
+#warning "Conbine configurations main mode is enabled."
 int main()
 {
     combine_configurations("weaseltemplate.ini",
