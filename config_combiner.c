@@ -58,11 +58,11 @@ void combine_configurations(char* primary_file_name,
 
     #warning "Primary copying is disabled"
     printf("\n");
-    // move_config_across_files(my_buf, 
-    //     primary_file, 
-    //     outfile, 
-    //     primary_device_number, 
-    //     COPY_MODE_PRIMARY);
+    move_config_across_files(my_buf, 
+        primary_file, 
+        outfile, 
+        primary_device_number, 
+        COPY_MODE_PRIMARY);
 
     printf("\n");
     move_config_across_files(my_buf, 
@@ -72,6 +72,7 @@ void combine_configurations(char* primary_file_name,
         COPY_MODE_SECONDARY);
 
     fclose(primary_file);   
+    fclose(secondary_file);   
     fclose(outfile);
 }
 
@@ -102,6 +103,7 @@ void move_config_across_files(char* my_buf, FILE* infile, FILE* outfile, int int
 
     if (mode == COPY_MODE_PRIMARY)
     {
+        printf("Printing combined file header.\n");
         fprintf(outfile, "%s\n",PARSE_PROFILE_LINE);
         fprintf(outfile, 
             "Device = DInput/%d/Wireless Gamepad\n",
@@ -117,6 +119,9 @@ void move_config_across_files(char* my_buf, FILE* infile, FILE* outfile, int int
         {
             int source_index = 0;
             int dest_index = LEN_MYBUF/2;
+            my_buf[dest_index+0] = '\0';
+            my_buf[dest_index+1] = '\0';
+            my_buf[dest_index+2] = '\0';
             while (
                 my_buf[source_index] != '\n' &&
                 my_buf[source_index] != '`' &&
@@ -145,7 +150,7 @@ void move_config_across_files(char* my_buf, FILE* infile, FILE* outfile, int int
                     dest_index++;
                 }
             }
-            fprintf(outfile, "%s",my_buf+LEN_MYBUF/2);
+            fprintf(outfile, "%s",my_buf+(LEN_MYBUF/2));
             move_line_count++;
         }
         else if (mode == COPY_MODE_PRIMARY)
