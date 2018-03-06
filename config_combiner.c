@@ -13,6 +13,8 @@
 #define PARSE_DEVICE_LINE "Device = DInput/%d/Wireless Gamepad"
 #define PARSE_PROFILE_LINE_LENGTH 10
 
+#define LEN_MYBUF 512
+
 void combiner_error(char* errormsg)
 {
     printf("ERROR: %s\n",errormsg);
@@ -44,16 +46,30 @@ void combine_configurations(char* primary_file_name,
         secondary_device_number,
         output_file_name);
 
-    char my_buf[8000];
+    char my_buf[LEN_MYBUF];
     FILE* primary_file = fopen(primary_file_name,STRING_READ_MODE);
+    FILE* secondary_file = fopen(secondary_file_name,STRING_READ_MODE);
     FILE* outfile = fopen(output_file_name,STRING_WRITE_MODE);
+
+    if (!primary_file ||
+        !secondary_file ||
+        !outfile)
+        combiner_error("Failed to find a file.");
+
+    #warning "Primary copying is disabled"
+    printf("\n");
+    // move_config_across_files(my_buf, 
+    //     primary_file, 
+    //     outfile, 
+    //     primary_device_number, 
+    //     COPY_MODE_PRIMARY);
 
     printf("\n");
     move_config_across_files(my_buf, 
-        primary_file, 
+        secondary_file, 
         outfile, 
-        primary_device_number, 
-        COPY_MODE_PRIMARY);
+        secondary_device_number, 
+        COPY_MODE_SECONDARY);
 
     fclose(primary_file);   
     fclose(outfile);
@@ -94,35 +110,64 @@ void move_config_across_files(char* my_buf, FILE* infile, FILE* outfile, int int
     }
 
     printf("Moving %s controls to output file...", modename);
-    int primary_move_line_count = 0;
-    while(fgets(my_buf, 8000, infile))
-    {       
-
+    int move_line_count = 0;
+    while(fgets(my_buf, LEN_MYBUF, infile))
+    {
         if (mode == COPY_MODE_SECONDARY)
         {
-            //do the ` parsing here
-            #warning "Quote parsing incomplete"
+            int source_index = 0;
+            int dest_index = LEN_MYBUF/2;
+            while (
+                my_buf[source_index] != '\n' &&
+                my_buf[source_index] != '`' &&
+                my_buf[source_index] != '\0'
+                )
+            {
+                my_buf[dest_index] = my_buf[source_index];
+                source_index++;
+                dest_index++;
+            }
+
+            if (my_buf[source_index] == '`')
+            {   
+                dest_index += 
+                sprintf(my_buf+dest_index, 
+                    "`DInput/%d/Wireless Gamepad:",
+                    intended_device_number);
+                source_index++;
+                while (
+                    my_buf[source_index] != '\n' &&
+                    my_buf[source_index] != '\0'
+                    )
+                {
+                    my_buf[dest_index] = my_buf[source_index];
+                    source_index++;
+                    dest_index++;
+                }
+            }
+            fprintf(outfile, "%s",my_buf+LEN_MYBUF/2);
+            move_line_count++;
         }
         else if (mode == COPY_MODE_PRIMARY)
         {
             fprintf(outfile, "%s",my_buf);
-            primary_move_line_count++;
+            move_line_count++;
         }
-        
-        
+        fflush(outfile);    
     }
 
-    printf("Moved %d lines.\n",primary_move_line_count);
+    printf("Moved %d lines.\n",move_line_count);
 }
 
 #ifdef comb_test
-#warning "Conbine configurations main mode is enabled."
+#warning "Conbine configurations main is enabled."
 int main()
 {
-    combine_configurations("weaseltemplate.ini",
-        "null",
-        0,
-        1,
+    combine_configurations(
+        "mp-leftonly.ini",
+        "smash-R.ini",
+        99,
+        88,
         "wcopy.ini");
 }
 #endif
