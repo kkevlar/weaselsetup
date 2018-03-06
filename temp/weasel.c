@@ -4,7 +4,7 @@
 #include <string.h>
 
 #define MAX_CONTROLLERS 24
-#define GCPAD_PATH "../../Dolphin\\ Emulator/Config/Profiles/GCPad/"
+#define MAX_GC 4
 #define true 1
 
 
@@ -22,12 +22,27 @@ void get_joysticks(SDL_Joystick** joys)
 }
 
 
-int main(void)
+int main(int argc, char **argv)
 {   
-    SDL_Joystick* controllers[MAX_CONTROLLERS]; 
-    // char nullstring[] = "null";
+    SDL_Joystick* controllers[MAX_CONTROLLERS];
 
-    printf("\nThis is the Weasel Setup Wizard\n");
+    int joyids[MAX_GC * 2];
+    int indx = 0;
+
+    if (argc != 2)
+        return 1;
+    
+    int joycount = **(argv+ argc-1) - '0';
+
+    if (joycount > MAX_GC || joycount < 1)
+    {
+        return;
+    }
+
+    for (int g = 0; g < MAX_GC; g++)
+        joyids[g] = -1;
+
+    printf("\nWill set up %d full gamecubes.\n", joycount);
     printf("Initializing SDL... ");
     SDL_Init(SDL_INIT_JOYSTICK);
     printf("Initialized\n");
@@ -35,12 +50,10 @@ int main(void)
     get_joysticks(controllers);
     printf("Initialized\n");
 
-    
-    // printf("lmao %s\n", SDL_JoystickNameForIndex(0));
-
     printf("\nHere is a list of the joysticks connected: \n");
 
     SDL_JoystickUpdate();
+
     for(int i = 0; i < MAX_CONTROLLERS; i++)
     {
         if (controllers[i] && SDL_JoystickNameForIndex(i) )
@@ -49,16 +62,39 @@ int main(void)
         }
     }
 
-    char filenamebuf[64];
-    sprintf(filenamebuf,"%smp-leftonly.ini",GCPAD_PATH);
-    FILE* leftonly = fopen(filenamebuf,"r");
+    int listening = 1;
 
-    fclose(leftonly);
+    while(true)
+    {
+        SDL_JoystickUpdate();
+        for(int i = 0; listening && i < MAX_CONTROLLERS; i++)
+        {
+            if (controllers[i] && SDL_JoystickNameForIndex(i) )
+            {
+                int test = 0;
+                for (int g = 0; g < MAX_GC; g++)
+                    test += joyids[g] == i ? 1 : 0;
+                for (int id = 0; listening && !test && id < 24; id++)
+                {
+                    int but =  SDL_JoystickGetButton(controllers[i], id);
+                    if(but)
+                    {
+                        joyids[indx] = i;
+                        listening = 0;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
 
 
 
 
     printf("\n");
+
+
 
     // while(true)
     // {
