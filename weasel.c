@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <SDL2/SDL.h>
 #include <string.h>
+#include "config_combiner.h"
 
 #define MAX_DEVICE_COUNT 24
 #define NUM_DIGITAL_BUTTONS_TESTED 12
@@ -81,7 +82,7 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    for (int i = 0; i < MAX_GC; i++)
+    for (int i = 0; i < MAX_GC*2; i++)
         joystick_id_list[i] = -1;
 
     printf("\nWill set up %d full gamecubes.\n", 
@@ -123,7 +124,29 @@ int main(int argc, char **argv)
             curr_joystick_id_list_index);
     }
 
-    #warning "gotta combine configs still"
+    for (int i = 0; i < MAX_GC * 2; i++)
+    {
+        printf("%d ",joystick_id_list[i]);
+        // if (joystick_id_list[i] %2== 0)
+        //     joystick_id_list[i]++;
+        // else if (joystick_id_list[i] %2== 1)
+        //     joystick_id_list[i]--;
+        printf("%d\n",joystick_id_list[i]);
+
+
+    }
+
+    for(int g = 0; g < full_gamecube_controller_count; g++)
+    {
+        char namebuffer[128];
+        sprintf(namebuffer, "../../Dolphin Emulator/Config/Profiles/GCPad/%d-weaselout.ini", g+1);
+        combine_configurations(
+            "../../Dolphin Emulator/Config/Profiles/GCPad/smashL.ini",
+            "../../Dolphin Emulator/Config/Profiles/GCPad/smashR.ini",
+            joystick_id_list[g*2 + 0],
+            joystick_id_list[g*2 + 1],
+            namebuffer);
+    }
 
 
     printf("Quitting SDL... ");

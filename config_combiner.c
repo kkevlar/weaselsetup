@@ -13,7 +13,7 @@
 #define PARSE_DEVICE_LINE "Device = DInput/%d/Wireless Gamepad"
 #define PARSE_PROFILE_LINE_LENGTH 10
 
-#define LEN_MYBUF 512
+#define LEN_MYBUF 4000
 
 #if defined(COMB_TEST) || defined(COMB_SHOW_DEBUG_OUTPUT) 
 #define DOPRINT 
@@ -119,6 +119,8 @@ int combine_configurations(char* primary_file_name,
 
 int move_config_across_files(char* my_buf, FILE* infile, FILE* outfile, int intended_device_number, int mode)
 {
+    // printf("ASS %d\n",intended_device_number);
+
     #ifdef DOPRINT
         char modename[16];
         if (COPY_MODE_PRIMARY == mode)
