@@ -6,13 +6,16 @@
 #define MAX_DEVICE_COUNT 24
 #define MAX_GC 4
 
+#ifndef comb_test
 void fill_joystick_list(SDL_Joystick** joys)
 {    
     const int n = SDL_NumJoysticks();
     for (int i = 0; i < n; ++i) 
+    {
         *(joys+i) = SDL_JoystickOpen(i);
         if (! SDL_JoystickNameForIndex(i))
             *(joys+i) = 0;
+    }
 }
 
 
@@ -97,3 +100,4 @@ int main(int argc, char **argv)
     return 0;
 
 }
+#endif

@@ -15,11 +15,11 @@
 
 #define LEN_MYBUF 512
 
-void combiner_error(char* errormsg)
+int combiner_error(char* errormsg)
 {
     printf("ERROR: %s\n",errormsg);
     printf("Parsing failed.\n");
-    exit(1);
+    return 1;
 }
 
 void combiner_burn_whitespace(FILE* file)
@@ -33,7 +33,7 @@ void combiner_burn_whitespace(FILE* file)
     }
 }
 
-void combine_configurations(char* primary_file_name,
+int combine_configurations(char* primary_file_name,
     char* secondary_file_name,
     int primary_device_number,
     int secondary_device_number,
@@ -51,21 +51,30 @@ void combine_configurations(char* primary_file_name,
     FILE* secondary_file = fopen(secondary_file_name,STRING_READ_MODE);
     FILE* outfile = fopen(output_file_name,STRING_WRITE_MODE);
 
+    int failure = 0;
+
     if (!primary_file ||
         !secondary_file ||
         !outfile)
-        combiner_error("Failed to find a file.");
+        return combiner_error("Failed to find a file.");
 
     #ifdef noc1
         #warning "Primary copying is disabled"
         printf("\nPrimary copying is disabled.\n");
     #else
         printf("\n");
-        move_config_across_files(my_buf, 
+        failure = move_config_across_files(my_buf, 
             primary_file, 
             outfile, 
             primary_device_number, 
             COPY_MODE_PRIMARY);
+        if (failure)
+        {
+            fclose(primary_file);   
+            fclose(secondary_file);   
+            fclose(outfile);
+            return failure;
+        }
     #endif
 
     #ifdef noc2
@@ -73,19 +82,27 @@ void combine_configurations(char* primary_file_name,
         printf("\nSecondary copying is disabled\n");
     #else
         printf("\n");
-        move_config_across_files(my_buf, 
+        failure = move_config_across_files(my_buf, 
             secondary_file, 
             outfile, 
             secondary_device_number, 
             COPY_MODE_SECONDARY);
+        if (failure)
+        {
+            fclose(primary_file);   
+            fclose(secondary_file);   
+            fclose(outfile);
+            return failure;
+        }
     #endif
 
     fclose(primary_file);   
     fclose(secondary_file);   
     fclose(outfile);
+    return 0;
 }
 
-void move_config_across_files(char* my_buf, FILE* infile, FILE* outfile, int intended_device_number, int mode)
+int move_config_across_files(char* my_buf, FILE* infile, FILE* outfile, int intended_device_number, int mode)
 {
     char modename[16];
     if (COPY_MODE_PRIMARY == mode)
@@ -96,14 +113,14 @@ void move_config_across_files(char* my_buf, FILE* infile, FILE* outfile, int int
     fgets(my_buf, PARSE_PROFILE_LINE_LENGTH, infile);
     int result = strcmp(PARSE_PROFILE_LINE,my_buf);
     if(result)
-        combiner_error(STRING_ERROR_MALFORMED_PROFILE);
+        return combiner_error(STRING_ERROR_MALFORMED_PROFILE);
 
     combiner_burn_whitespace(infile);
 
     int deviceno;
     result = fscanf(infile,PARSE_DEVICE_LINE,&deviceno);
     if(result != 1)
-        combiner_error(STRING_ERROR_MALFORMED_DEVICE);
+        return combiner_error(STRING_ERROR_MALFORMED_DEVICE);
 
     printf("%s Device Number %d -> %d\n",
         modename,
@@ -174,6 +191,7 @@ void move_config_across_files(char* my_buf, FILE* infile, FILE* outfile, int int
     }
 
     printf("Moved %d lines.\n",move_line_count);
+    return 0;
 }
 
 #ifdef comb_test
@@ -186,5 +204,6 @@ int main()
         7,
         4,
         "../../Dolphin Emulator/Config/Profiles/GCPad/0-comp-test-output.ini");
+    return 0;
 }
 #endif
