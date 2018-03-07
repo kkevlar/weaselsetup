@@ -123,6 +123,8 @@ int main(int argc, char **argv)
             curr_joystick_id_list_index);
     }
 
+    #warning "gotta combine configs still"
+
 
     printf("Quitting SDL... ");
     SDL_Quit();

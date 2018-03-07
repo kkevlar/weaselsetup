@@ -41,8 +41,13 @@ void combiner_burn_whitespace(FILE* file)
 
 int combine_configurations(char* primary_file_name,
     char* secondary_file_name,
-    int primary_device_number,
-    int secondary_device_number,
+    #ifndef COMBINER_EXPANDED_DEVICE_ABILITIES
+        int primary_device_number,
+        int secondary_device_number,
+    #else
+        char primary_device_name,
+        char secondary_device_name,
+    #endif
     char* output_file_name)
 {
     #ifdef DOPRINT
