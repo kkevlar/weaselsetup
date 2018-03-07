@@ -15,10 +15,16 @@
 
 #define LEN_MYBUF 512
 
+#if defined(COMB_TEST) || defined(COMB_SHOW_DEBUG_OUTPUT) 
+#define DOPRINT 
+#endif
+
 int combiner_error(char* errormsg)
-{
-    printf("ERROR: %s\n",errormsg);
-    printf("Parsing failed.\n");
+{   
+    #ifdef DOPRINT
+        printf("ERROR: %s\n",errormsg);
+        printf("Parsing failed.\n");
+    #endif
     return 1;
 }
 
@@ -39,12 +45,14 @@ int combine_configurations(char* primary_file_name,
     int secondary_device_number,
     char* output_file_name)
 {
-    printf(STRING_ATTEMPT_DETAIL,
-        primary_file_name,
-        primary_device_number,
-        secondary_file_name,
-        secondary_device_number,
-        output_file_name);
+    #ifdef DOPRINT
+        printf(STRING_ATTEMPT_DETAIL,
+            primary_file_name,
+            primary_device_number,
+            secondary_file_name,
+            secondary_device_number,
+            output_file_name);
+    #endif
 
     char my_buf[LEN_MYBUF];
     FILE* primary_file = fopen(primary_file_name,STRING_READ_MODE);
@@ -58,11 +66,12 @@ int combine_configurations(char* primary_file_name,
         !outfile)
         return combiner_error("Failed to find a file.");
 
-    #ifdef noc1
+    #ifdef COMB_NO_1
         #warning "Primary copying is disabled"
-        printf("\nPrimary copying is disabled.\n");
+        #ifdef DOPRINT
+            printf("\nPrimary copying is disabled.\n");
+        #endif
     #else
-        printf("\n");
         failure = move_config_across_files(my_buf, 
             primary_file, 
             outfile, 
@@ -77,11 +86,12 @@ int combine_configurations(char* primary_file_name,
         }
     #endif
 
-    #ifdef noc2
+    #ifdef COMB_NO_2
         #warning "Secondary copying is disabled"
-        printf("\nSecondary copying is disabled\n");
+        #ifdef DOPRINT
+            printf("\nSecondary copying is disabled\n");
+        #endif
     #else
-        printf("\n");
         failure = move_config_across_files(my_buf, 
             secondary_file, 
             outfile, 
@@ -104,11 +114,13 @@ int combine_configurations(char* primary_file_name,
 
 int move_config_across_files(char* my_buf, FILE* infile, FILE* outfile, int intended_device_number, int mode)
 {
-    char modename[16];
-    if (COPY_MODE_PRIMARY == mode)
-        sprintf(modename,"%s","Primary");
-    else if (COPY_MODE_SECONDARY == mode)
-        sprintf(modename,"%s","Secondary");
+    #ifdef DOPRINT
+        char modename[16];
+        if (COPY_MODE_PRIMARY == mode)
+            sprintf(modename,"%s","Primary");
+        else if (COPY_MODE_SECONDARY == mode)
+            sprintf(modename,"%s","Secondary");
+    #endif
 
     fgets(my_buf, PARSE_PROFILE_LINE_LENGTH, infile);
     int result = strcmp(PARSE_PROFILE_LINE,my_buf);
@@ -122,14 +134,18 @@ int move_config_across_files(char* my_buf, FILE* infile, FILE* outfile, int inte
     if(result != 1)
         return combiner_error(STRING_ERROR_MALFORMED_DEVICE);
 
-    printf("%s Device Number %d -> %d\n",
-        modename,
-        deviceno,
-        intended_device_number);
+    #ifdef DOPRINT
+        printf("\n%s Device Number %d -> %d\n",
+            modename,
+            deviceno,
+            intended_device_number);
+    #endif
 
     if (mode == COPY_MODE_PRIMARY)
-    {
-        printf("Printing combined file header.\n");
+    {   
+        #ifdef DOPRINT
+            printf("Printing combined file header.\n");
+        #endif
         fprintf(outfile, "%s\n",PARSE_PROFILE_LINE);
         fprintf(outfile, 
             "Device = DInput/%d/Wireless Gamepad\n",
@@ -137,7 +153,10 @@ int move_config_across_files(char* my_buf, FILE* infile, FILE* outfile, int inte
         fflush(outfile);
     }
 
-    printf("Moving %s controls to output file...", modename);
+    #ifdef DOPRINT
+        printf("Moving %s controls to output file...", modename);
+    #endif
+
     int move_line_count = 0;
     while(fgets(my_buf, LEN_MYBUF, infile))
     {
@@ -190,11 +209,14 @@ int move_config_across_files(char* my_buf, FILE* infile, FILE* outfile, int inte
         fflush(outfile);    
     }
 
-    printf("Moved %d lines.\n",move_line_count);
+    #ifdef DOPRINT
+        printf("Moved %d lines.\n",move_line_count);
+    #endif
+
     return 0;
 }
 
-#ifdef comb_test
+#ifdef COMB_TEST
 #warning "Conbine configurations main is enabled."
 int main()
 {
