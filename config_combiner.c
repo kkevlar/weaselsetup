@@ -56,20 +56,29 @@ void combine_configurations(char* primary_file_name,
         !outfile)
         combiner_error("Failed to find a file.");
 
-    #warning "Primary copying is disabled"
-    printf("\n");
-    move_config_across_files(my_buf, 
-        primary_file, 
-        outfile, 
-        primary_device_number, 
-        COPY_MODE_PRIMARY);
+    #ifdef noc1
+        #warning "Primary copying is disabled"
+        printf("\nPrimary copying is disabled.\n");
+    #else
+        printf("\n");
+        move_config_across_files(my_buf, 
+            primary_file, 
+            outfile, 
+            primary_device_number, 
+            COPY_MODE_PRIMARY);
+    #endif
 
-    printf("\n");
-    move_config_across_files(my_buf, 
-        secondary_file, 
-        outfile, 
-        secondary_device_number, 
-        COPY_MODE_SECONDARY);
+    #ifdef noc2
+        #warning "Secondary copying is disabled"
+        printf("\nSecondary copying is disabled\n");
+    #else
+        printf("\n");
+        move_config_across_files(my_buf, 
+            secondary_file, 
+            outfile, 
+            secondary_device_number, 
+            COPY_MODE_SECONDARY);
+    #endif
 
     fclose(primary_file);   
     fclose(secondary_file);   
@@ -149,6 +158,9 @@ void move_config_across_files(char* my_buf, FILE* infile, FILE* outfile, int int
                     source_index++;
                     dest_index++;
                 }
+                my_buf[dest_index] = my_buf[source_index];
+                source_index++;
+                dest_index++;
             }
             fprintf(outfile, "%s",my_buf+(LEN_MYBUF/2));
             move_line_count++;
@@ -169,10 +181,10 @@ void move_config_across_files(char* my_buf, FILE* infile, FILE* outfile, int int
 int main()
 {
     combine_configurations(
-        "mp-leftonly.ini",
-        "smash-R.ini",
-        99,
-        88,
-        "wcopy.ini");
+        "../../Dolphin Emulator/Config/Profiles/GCPad/k-smash-l.ini",
+        "../../Dolphin Emulator/Config/Profiles/GCPad/mp-leftonly.ini",
+        7,
+        4,
+        "../../Dolphin Emulator/Config/Profiles/GCPad/0-comp-test-output.ini");
 }
 #endif
