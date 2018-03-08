@@ -119,9 +119,13 @@ int main(int argc, char **argv)
         printf("Press button on the %s half of P%d...\n",
             left_or_right_string,
             (curr_joystick_id_list_index/2)+1);
-        listen_for_joystick_buttonpress(joystick_list, 
-            joystick_id_list, 
-            curr_joystick_id_list_index);
+        #ifndef SKIP_REAL_JOYSTICKS
+            listen_for_joystick_buttonpress(joystick_list, 
+                joystick_id_list, 
+                curr_joystick_id_list_index);
+        #else
+            joystick_id_list[curr_joystick_id_list_index] = curr_joystick_id_list_index*curr_joystick_id_list_index+1;
+        #endif
     }
 
     for (int i = 0; i < MAX_GC * 2; i++)

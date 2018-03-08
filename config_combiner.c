@@ -13,15 +13,17 @@
 #define PARSE_DEVICE_LINE "Device = DInput/%d/Wireless Gamepad"
 #define PARSE_PROFILE_LINE_LENGTH 10
 
-#define LEN_MYBUF 4000
+
+#define LEN_MYBUF 512
+
 
 #if defined(COMB_TEST) || defined(COMB_SHOW_DEBUG_OUTPUT) 
-#define DOPRINT 
+#define ALLOW_CONFIG_COPIER_DEBUG_OUTPUT 
 #endif
 
 int combiner_error(char* errormsg)
 {   
-    #ifdef DOPRINT
+    #ifdef ALLOW_CONFIG_COPIER_DEBUG_OUTPUT
         printf("ERROR: %s\n",errormsg);
         printf("Parsing failed.\n");
     #endif
@@ -50,7 +52,7 @@ int combine_configurations(char* primary_file_name,
     #endif
     char* output_file_name)
 {
-    #ifdef DOPRINT
+    #ifdef ALLOW_CONFIG_COPIER_DEBUG_OUTPUT
         printf(STRING_ATTEMPT_DETAIL,
             primary_file_name,
             primary_device_number,
@@ -73,7 +75,7 @@ int combine_configurations(char* primary_file_name,
 
     #ifdef COMB_NO_1
         #warning "Primary copying is disabled"
-        #ifdef DOPRINT
+        #ifdef ALLOW_CONFIG_COPIER_DEBUG_OUTPUT
             printf("\nPrimary copying is disabled.\n");
         #endif
     #else
@@ -93,7 +95,7 @@ int combine_configurations(char* primary_file_name,
 
     #ifdef COMB_NO_2
         #warning "Secondary copying is disabled"
-        #ifdef DOPRINT
+        #ifdef ALLOW_CONFIG_COPIER_DEBUG_OUTPUT
             printf("\nSecondary copying is disabled\n");
         #endif
     #else
@@ -121,7 +123,7 @@ int move_config_across_files(char* my_buf, FILE* infile, FILE* outfile, int inte
 {
     // printf("ASS %d\n",intended_device_number);
 
-    #ifdef DOPRINT
+    #ifdef ALLOW_CONFIG_COPIER_DEBUG_OUTPUT
         char modename[16];
         if (COPY_MODE_PRIMARY == mode)
             sprintf(modename,"%s","Primary");
@@ -141,7 +143,7 @@ int move_config_across_files(char* my_buf, FILE* infile, FILE* outfile, int inte
     if(result != 1)
         return combiner_error(STRING_ERROR_MALFORMED_DEVICE);
 
-    #ifdef DOPRINT
+    #ifdef ALLOW_CONFIG_COPIER_DEBUG_OUTPUT
         printf("\n%s Device Number %d -> %d\n",
             modename,
             deviceno,
@@ -150,7 +152,7 @@ int move_config_across_files(char* my_buf, FILE* infile, FILE* outfile, int inte
 
     if (mode == COPY_MODE_PRIMARY)
     {   
-        #ifdef DOPRINT
+        #ifdef ALLOW_CONFIG_COPIER_DEBUG_OUTPUT
             printf("Printing combined file header.\n");
         #endif
         fprintf(outfile, "%s\n",PARSE_PROFILE_LINE);
@@ -160,7 +162,7 @@ int move_config_across_files(char* my_buf, FILE* infile, FILE* outfile, int inte
         fflush(outfile);
     }
 
-    #ifdef DOPRINT
+    #ifdef ALLOW_CONFIG_COPIER_DEBUG_OUTPUT
         printf("Moving %s controls to output file...", modename);
     #endif
 
@@ -204,7 +206,9 @@ int move_config_across_files(char* my_buf, FILE* infile, FILE* outfile, int inte
                 my_buf[dest_index] = my_buf[source_index];
                 source_index++;
                 dest_index++;
+                my_buf[dest_index++] = '\0';
             }
+            // fprintf(outfile,"*");
             fprintf(outfile, "%s",my_buf+(LEN_MYBUF/2));
             move_line_count++;
         }
@@ -216,7 +220,7 @@ int move_config_across_files(char* my_buf, FILE* infile, FILE* outfile, int inte
         fflush(outfile);    
     }
 
-    #ifdef DOPRINT
+    #ifdef ALLOW_CONFIG_COPIER_DEBUG_OUTPUT
         printf("Moved %d lines.\n",move_line_count);
     #endif
 
@@ -228,10 +232,10 @@ int move_config_across_files(char* my_buf, FILE* infile, FILE* outfile, int inte
 int main()
 {
     combine_configurations(
-        "../../Dolphin Emulator/Config/Profiles/GCPad/k-smash-l.ini",
-        "../../Dolphin Emulator/Config/Profiles/GCPad/mp-leftonly.ini",
-        7,
-        4,
+        "../../Dolphin Emulator/Config/Profiles/GCPad/smashL.ini",
+        "../../Dolphin Emulator/Config/Profiles/GCPad/smashR.ini",
+        3,
+        6,
         "../../Dolphin Emulator/Config/Profiles/GCPad/0-comp-test-output.ini");
     return 0;
 }
