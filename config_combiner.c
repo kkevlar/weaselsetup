@@ -14,7 +14,7 @@
 #define PARSE_PROFILE_LINE_LENGTH 10
 
 
-#define LEN_MYBUF 512
+#define LEN_MYBUF 1024
 
 
 #if defined(COMB_TEST) || defined(COMB_SHOW_DEBUG_OUTPUT) 
