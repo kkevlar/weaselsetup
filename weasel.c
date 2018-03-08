@@ -9,6 +9,15 @@
 #define MAX_GC 4
 
 #ifndef COMB_TEST
+
+#include <signal.h>
+
+static volatile int should_continue_listening_for_digital_input = 1;
+
+void intHandler(int dummy) {
+    should_continue_listening_for_digital_input = 0;
+}
+
 void fill_joystick_list(SDL_Joystick** joys)
 {    
     const int n = SDL_NumJoysticks();
@@ -24,7 +33,7 @@ int listen_for_joystick_buttonpress(SDL_Joystick** joystick_list,
     int* joystick_id_list, 
     int curr_joystick_id_list_index)
 {
-    int should_continue_listening_for_digital_input = 1;
+    should_continue_listening_for_digital_input = 1;
     
     while(should_continue_listening_for_digital_input)
     {
@@ -106,7 +115,7 @@ int main(int argc, char **argv)
         }
     }
 
-    
+   signal(SIGINT, intHandler);    
 
     for (curr_joystick_id_list_index = 0;
         curr_joystick_id_list_index < full_gamecube_controller_count*2;
