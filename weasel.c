@@ -5,8 +5,7 @@
 #define MAX_GC 4
 
 #ifndef COMB_TEST
-
-#include <signal.h>
+#ifndef SKIP_REAL_JOYSTICKS
 
 static volatile int should_continue_listening_for_digital_input = 1;
 
@@ -64,17 +63,20 @@ int listen_for_joystick_buttonpress(SDL_Joystick** joystick_list,
     }
     return 0;
 }
+#endif
 
 
 int main(int argc, char **argv)
 {   
     if (argc != 2)
     {
-        printf("Terminating due to unexpected number of command line args.");
+        printf("Terminating due to unexpected number of command line args.\n");
         return 1;
     }
 
-    SDL_Joystick* joystick_list[MAX_DEVICE_COUNT];
+    #ifndef SKIP_REAL_JOYSTICKS
+	    SDL_Joystick* joystick_list[MAX_DEVICE_COUNT];
+	#endif
 
     int joystick_id_list[MAX_GC * 2];
     int curr_joystick_id_list_index = 0;    
@@ -92,26 +94,29 @@ int main(int argc, char **argv)
 
     printf("\nWill set up %d full gamecubes.\n", 
         full_gamecube_controller_count);
-    printf("Initializing SDL... ");
-    SDL_Init(SDL_INIT_JOYSTICK);
-    printf("Initialized\n");
-    printf("Initializing joysticks... ");
-    fill_joystick_list(joystick_list);
-    printf("Initialized\n");
 
-    printf("\nHere is a list of the joysticks connected: \n");
+    #ifndef SKIP_REAL_JOYSTICKS
+	    printf("Initializing SDL... ");
+	    SDL_Init(SDL_INIT_JOYSTICK);
+	    printf("Initialized\n");
+	    printf("Initializing joysticks... ");
+	    fill_joystick_list(joystick_list);
+	    printf("Initialized\n");
 
-    SDL_JoystickUpdate();
+	    printf("\nHere is a list of the joysticks connected: \n");
 
-    for(int i = 0; i < MAX_DEVICE_COUNT; i++)
-    {
-        if (joystick_list[i] && SDL_JoystickNameForIndex(i) )
-        {
-            printf("  - %d: %s\n",i,SDL_JoystickNameForIndex(i));
-        }
-    }
+	    SDL_JoystickUpdate();
 
-   signal(SIGINT, intHandler);    
+	    for(int i = 0; i < MAX_DEVICE_COUNT; i++)
+	    {
+	        if (joystick_list[i] && SDL_JoystickNameForIndex(i) )
+	        {
+	            printf("  - %d: %s\n",i,SDL_JoystickNameForIndex(i));
+	        }
+	    }
+
+	   signal(SIGINT, intHandler); 
+   #endif   
 
     for (curr_joystick_id_list_index = 0;
         curr_joystick_id_list_index < full_gamecube_controller_count*2;
@@ -157,9 +162,11 @@ int main(int argc, char **argv)
             namebuffer);
     }
 
+    #ifndef SKIP_REAL_JOYSTICKS
+	    printf("Quitting SDL... ");
+	    SDL_Quit();
+	#endif
 
-    printf("Quitting SDL... ");
-    SDL_Quit();
     printf("Quit Successful\nGoodbye!\n\n");
 
     
