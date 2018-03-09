@@ -1,8 +1,4 @@
-#include <math.h>
-#include <stdio.h>
-#include <SDL2/SDL.h>
-#include <string.h>
-#include "config_combiner.h"
+#include "weasel.h"
 
 #define MAX_DEVICE_COUNT 24
 #define NUM_DIGITAL_BUTTONS_TESTED 12
